@@ -68,7 +68,8 @@ class Predictor(object):
         with torch.no_grad():
             tic = time.time()
             for steps, (data, filenames) in enumerate(self.dataloader_predict, start=1):
-                data = data.to(self.model.device, non_blocking = True)
+                data = data.to("cuda", non_blocking = True)
+                #data = data.to(self.model.device, non_blocking = True)
                 #data_time.update(time.time() - tic)
                 pre_tic = time.time()
                 logits = self.model(data)
@@ -81,7 +82,14 @@ class Predictor(object):
                 #predict_time.update(time.time() - pre_tic)
                 #batch_time.update(time.time() - tic)
                 tic = time.time()
-
+            # 输出一些信息以验证方法是否被调用
+            print("Predictor's predict() method called.")
+            
+            # 输出一些参数的值来检查是否正确传递
+            print("args:", self.args)
+            #print("model:", self.model)
+            #print("dataloader_predict:", self.dataloader_predict)
+            
             #print("Predicting and Saving Done!\n"
             #      "Total Time: {:.2f}\n"
             #      "Data Time: {:.2f}\n"

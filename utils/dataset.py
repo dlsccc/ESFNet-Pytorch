@@ -64,7 +64,8 @@ class Cropper(object):
         self.label_margin_color = args.label_margin_color
 
     def get_filename(self, path):
-        return path.split('/')[-1].split('.')[0]
+        #return path.split('/')[-1].split('.')[0]
+        return os.path.basename(path).split(".")[0]
 
     def ensure_and_mkdir(self, path):
         if not os.path.exists(path):
@@ -113,7 +114,11 @@ class Cropper(object):
     def save_images(self, patches, save_path, father_name):
 
         for i, patch in enumerate(patches):
+            #aaa=os.path.join(save_path, father_name + str(i) + '.png')
             cv2.imwrite(os.path.join(save_path, father_name + str(i) + '.png'), patch)
+        #print("father_name=%s"%father_name)
+        #print("savepath=%s"%save_path)
+            #print("aaa=%s"%aaa)
 
     def image_processor(self, image_path, label_path=None):
 
@@ -122,6 +127,7 @@ class Cropper(object):
         patches, n_w, n_h, image_h, image_w = self.pad_and_crop_images(image=image, margin_color=self.image_margin_color)
         # patches is saved in input_path/image_patches
         input_path = os.path.join(self.input_path, 'image_patches')
+        print("input=%s"%input_path)
         self.save_images(patches, input_path, filename)
 
         if self.predict is False:

@@ -64,6 +64,7 @@ def main():
 
     # model load the pre-trained weight, load ckpt once out of predictor
     model = ESFNet(config=config).to('cuda:{}'.format(args.gpu) if args.gpu >= 0 else 'cpu')
+    print(args.ckpt_path)
     ckpt = torch.load(args.ckpt_path, map_location='cuda:{}'.format(args.gpu) if args.gpu >=0 else 'cpu')
     model.load_state_dict(ckpt['state_dict'])
 
@@ -82,6 +83,8 @@ def main():
         # predict using pre-trained network
         p = Predictor(args=args, model=model, dataloader_predict=my_dataloader)
         p.predict()
+        print(p)
+        print(p.patches)
         # patches [total_size, C, H, W] p.patches tensor -> reshape -> [total_size, H, W, C]
         patches_tensor = torch.transpose(p.patches, 1, 3)
         patches_tensor = patches_tensor.view(n_h, n_w, config.cropped_size, config.cropped_size, 3)
@@ -98,7 +101,7 @@ def patchify_and_unpatchify_test():
     args = config_parser()
     config = MyConfiguration()
 
-    source_image_path = os.path.join(args.input, 'top_mosaic_09cm_area17.tif')
+    source_image_path = os.path.join(args.input, 'qingdao.tif')
     filename = source_image_path.split('/')[-1].split('.')[0]
     c = Cropper(args=args, configs=config, predict=True)
     patches, n_w, n_h, image_h, image_w = c.image_processor(image_path=source_image_path)
@@ -111,5 +114,5 @@ def patchify_and_unpatchify_test():
 
 if __name__ == '__main__':
 
-    #main()
-    patchify_and_unpatchify_test()
+    main()
+    #patchify_and_unpatchify_test()

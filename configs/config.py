@@ -1,31 +1,44 @@
+import os
 from configparser import ConfigParser
 import configparser
 
 """
-    # section distinguish the upper and lower letters, but key and value do not.
-    The information in the configuration always store the data in string format, it will have translation when reading.
-    [DEFAULT]: the value in [DEFAULT] offer default_value to all sections, and it owns the highest priority. 
+    # section distinguish the upper and lower letters, but key and value do not.  节区分大小写，但是键和值不区分大小写。
+    The information in the configuration always store the data in string format, it will have translation when reading. 配置文件信息存储为字符串格式，当读取时需要转换格式。
+    [DEFAULT]: the value in [DEFAULT] offer default_value to all sections, and it owns the highest priority.    配置文件中的"[DEFAULT]"节提供了默认值，它将对所有节有效，并具有最高优先级。也就是说，如果某个节中没有定义某个键的值，那么它将从"[DEFAULT]"节中获取默认值。
     get: getboolean() getint() getfloat()
     get方法 提供一个更复杂的界面 保持向后兼容性 可以回退关键字仅提供回退值
-    fallback 回退值
+    fallback 回退值    get方法提供了fallback（回退）参数，用于在未找到指定键时提供回退值，以确保不会出现异常。
     
     refer values in other sections
     interpolation method: configparser.BasicInterpolation()
-                          configparser.ExtendedInterpolation() ${section:key}
-    config.set
-    config.write
+                          configparser.ExtendedInterpolation() ${section:key}   
+                          配置文件中的某个节可以引用其他节中的值。这种引用的方式是使用插值方法。
+                          标准的插值方法为configparser.BasicInterpolation()，
+                          扩展插值方法为configparser.ExtendedInterpolation()。
+                          使用扩展插值方法时，可以使用${section:key}的形式引用其他节中的键值。
+    config.set          config.set方法用于在程序中设置配置文件的键值对。
+    config.write        config.write方法用于将更新后的配置文件写回到磁盘上，以保存配置文件的修改。
 """
 class MyConfiguration():
     def __init__(self, config_file=None):
-        super(MyConfiguration, self).__init__()
+        super(MyConfiguration, self).__init__()            #感觉这里没必要写super？######
 
         # ./ current directory
         if config_file is None:
-            config_file = './configs/config.cfg'
+            # 获取当前脚本所在的绝对路径
+            current_path = os.path.abspath(os.path.dirname(__file__))
+            # 将配置文件的相对路径与当前路径拼接
+            config_file = os.path.join(current_path, 'config.cfg')
 
         config = ConfigParser()
         # interpolation method
         config._interpolation = configparser.ExtendedInterpolation()
+        
+        #Specify the encooding to utf-8 to avoid UnicodeDecodeError
+        #with open(config_file,'r',encoding='utf-8') as f:
+        #    config.read_file(f)
+
         config.read(filenames= config_file)
 
         self.config = config
@@ -109,6 +122,14 @@ class MyConfiguration():
     @property
     def cropped_size(self):
         return self.config.getint("Data", "cropped_size")
+    
+    @property
+    def step_x(self):
+        return self.config.getint("Data", "step_x")
+    
+    @property
+    def step_y(self):
+        return self.config.getint("Data", "step_y")
 
     @property
     def input_size(self):
